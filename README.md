@@ -5,7 +5,7 @@
 **the calmest, most beautiful to-do list you'll ever use**
 
 ![vibe to-do preview](https://raw.githubusercontent.com/realmatipoint/vibe-to-do/main/png1.png)
-*(replace the link above with a real screenshot when you add one)*
+*(light mode preview)*
 
 <img src="https://img.shields.io/badge/status-vibing-7c3aed?style=for-the-badge" alt="vibing"/>
 <img src="https://img.shields.io/badge/python-3.13-blue?style=for-the-badge&logo=python" alt="Python 3.13"/>
@@ -26,7 +26,7 @@
 ### Quick Start (30 seconds)
 
 ```bash
-git clone https://github.com/yourusername/vibe-todo.git
-cd vibe-todo
+git clone https://github.com/realmatipoint/vibe-to-do.git
+cd vibe-to-do
 pip install flask
 python app.py
