@@ -18,7 +18,7 @@
 - Floating subtle vibe words in the background
 - Tasks save forever (`tasks.json`)
 - Deleted tasks go to **History** (restore or permanently delete)
-- Smooth animations, glassmorphism, pure zen
+- Smooth animations, minimalistic
 - Works offline — just run locally
 
 
