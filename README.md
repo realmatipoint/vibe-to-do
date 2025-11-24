@@ -24,6 +24,7 @@
 - Deleted tasks go to **History** (restore or permanently delete)
 - Smooth animations, minimalistic
 - Works offline — just run locally
+- Fully open-source
 
 
 
