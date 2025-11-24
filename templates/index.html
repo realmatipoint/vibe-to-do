@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>vibe • to-do</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    .vibe-text {
+      font-size: 11px;
+      opacity: 0.08;
+      pointer-events: none;
+      position: absolute;
+      animation: float 30s infinite linear;
+    }
+    @keyframes float {
+      0% { transform: translateY(100vh) rotate(0deg); }
+      100% { transform: translateY(-100px) rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body class="h-full bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-500">
+  <!-- Subtle floating words -->
+  <div id="vibe-bg" class="fixed inset-0 overflow-hidden pointer-events-none"></div>
+
+  <div class="flex flex-col items-center justify-center min-h-screen p-6">
+    <div class="w-full max-w-2xl">
+
+      <div class="flex justify-between items-center mb-12">
+        <div>
+          <h1 class="text-6xl font-black tracking-tight">vibe to-do</h1>
+          <p class="text-gray-500 dark:text-gray-500 mt-2 text-lg">minimal • calm • forever</p>
+        </div>
+        <!-- Toggle -->
+        <button id="theme-toggle" class="p-4 rounded-2xl bg-gray-200 dark:bg-gray-800 hover:scale-110 transition">
+          <span class="hidden dark:inline text-yellow-400">Light Mode</span>
+          <span class="dark:hidden text-gray-800">Dark Mode</span>
+        </button>
+      </div>
+
+      <div class="bg-white dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 p-8 transition-all">
+
+        <!-- Add task -->
+        <form id="new-task-form" class="flex gap-4 mb-10">
+          <input type="text" id="task-input" placeholder="What's the vibe today?"
+            class="flex-1 px-6 py-4 bg-gray-100 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 rounded-2xl focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 text-lg placeholder-gray-500" />
+          <button type="submit" class="px-10 py-4 bg-gray-800 dark:bg-gray-700 text-white rounded-2xl font-medium hover:bg-gray-700 dark:hover:bg-gray-600 transition">
+            Add
+          </button>
+        </form>
+
+        <!-- Active tasks -->
+        <div>
+          <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-5">Active</h2>
+          <ul id="task-list" class="space-y-3"></ul>
+          <p id="empty-active" class="text-center py-16 text-gray-500 text-lg">No tasks yet — pure zen</p>
+        </div>
+
+        <!-- Trash -->
+        <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+          <div class="flex justify-between items-center mb-5">
+            <h2 class="text-xl font-semibold text-red-600 dark:text-red-500">History</h2>
+            <button id="toggle-trash" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">show / hide</button>
+          </div>
+          <div id="trash-container" class="hidden">
+            <ul id="trash-list" class="space-y-3"></ul>
+            <p id="empty-trash" class="text-center py-10 text-gray-500">Trash is empty</p>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="text-center text-gray-400 text-xs mt-12">Made with love & Python</p>
+    </div>
+  </div>
+
+  <script>
+    const vibes = ["flow","chill","glow","focus","calm","vibe","peace","code","build","dream","rise","win","breathe"];
+
+    // Floating background words
+    setInterval(() => {
+      const span = document.createElement('span');
+      span.className = 'vibe-text text-gray-400 dark:text-gray-600';
+      span.textContent = vibes[Math.floor(Math.random() * vibes.length)];
+      span.style.left = Math.random() * 100 + 'vw';
+      span.style.animationDuration = (Math.random() * 25 + 25) + 's';
+      document.getElementById('vibe-bg').appendChild(span);
+      setTimeout(() => span.remove(), 50000);
+    }, 1000);
+
+    // Theme toggle + remember preference
+    const toggle = document.getElementById('theme-toggle');
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    toggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    });
+
+    // Same perfect task logic as before
+    const taskList = document.getElementById("task-list");
+    const trashList = document.getElementById("trash-list");
+    const emptyActive = document.getElementById("empty-active");
+    const emptyTrash = document.getElementById("empty-trash");
+    const trashContainer = document.getElementById("trash-container");
+    const toggleTrash = document.getElementById("toggle-trash");
+
+    async function loadAll() {
+      const [activeRes, trashRes] = await Promise.all([fetch("/tasks"), fetch("/trash")]);
+      const active = await activeRes.json();
+      const trash = await trashRes.json();
+
+      taskList.innerHTML = "";
+      active.length ? emptyActive.classList.add("hidden") : emptyActive.classList.remove("hidden");
+      active.forEach(t => {
+        const li = document.createElement("li");
+        li.className = "flex items-center justify-between p-5 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition";
+        li.innerHTML = `
+          <label class="flex items-center gap-4 cursor-pointer flex-1">
+            <input type="checkbox" ${t.done?"checked":""} class="w-5 h-5 rounded">
+            <span class="${t.done?"line-through text-gray-500":""} text-lg">${t.text}</span>
+          </label>
+          <button class="text-red-500 hover:text-red-400 text-2xl">×</button>
+        `;
+        li.querySelector("input").onchange = () => fetch(`/toggle/${t.id}`, {method:"POST"}).then(loadAll);
+        li.querySelector("button").onclick = () => fetch(`/tasks?id=${t.id}`, {method:"DELETE"}).then(loadAll);
+        taskList.appendChild(li);
+      });
+
+      trashList.innerHTML = "";
+      trash.length ? emptyTrash.classList.add("hidden") : emptyTrash.classList.remove("hidden");
+      trash.forEach(t => {
+        const li = document.createElement("li");
+        li.className = "flex justify-between items-center p-4 bg-red-50/50 dark:bg-red-900/10 rounded-xl border border-red-200 dark:border-red-900/30";
+        li.innerHTML = `
+          <span class="text-gray-500 line-through">${t.text}</span>
+          <div class="flex gap-4 text-sm">
+            <button class="text-green-600 dark:text-green-400 hover:underline">restore</button>
+            <button class="text-red-600 dark:text-red-400 hover:underline">delete</button>
+          </div>
+        `;
+        li.querySelectorAll("button")[0].onclick = () => fetch(`/restore/${t.id}`, {method:"POST"}).then(loadAll);
+        li.querySelectorAll("button")[1].onclick = () => fetch(`/permadelete/${t.id}`, {method:"DELETE"}).then(loadAll);
+        trashList.appendChild(li);
+      });
+    }
+
+    document.getElementById("new-task-form").onsubmit = async e => {
+      e.preventDefault();
+      const text = document.getElementById("task-input").value.trim();
+      if (!text) return;
+      await fetch("/tasks", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({text})});
+      document.getElementById("task-input").value = "";
+      loadAll();
+    };
+
+    toggleTrash.onclick = () => trashContainer.classList.toggle("hidden");
+
+    loadAll();
+  </script>
+</body>
+</html>
