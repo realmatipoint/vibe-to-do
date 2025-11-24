@@ -4,8 +4,12 @@
 
 **the calmest, most beautiful to-do list you'll ever use**
 
-![vibe to-do preview](https://raw.githubusercontent.com/realmatipoint/vibe-to-do/main/png1.png)
-*(light mode preview)*
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/realmatipoint/vibe-to-do/raw/main/darkpreview.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/realmatipoint/vibe-to-do/raw/main/png1.png">
+    <img src="https://github.com/realmatipoint/vibe-to-do/raw/main/darkpreview.png" alt="vibe to-do • pure calm" width="700" style="border-radius:16px; box-shadow:0 20px 40px rgba(0,0,0,0.4);">
+  </picture>
+</p>
 
 <img src="https://img.shields.io/badge/status-vibing-7c3aed?style=for-the-badge" alt="vibing"/>
 <img src="https://img.shields.io/badge/python-3.13-blue?style=for-the-badge&logo=python" alt="Python 3.13"/>
